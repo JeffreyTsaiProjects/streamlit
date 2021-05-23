@@ -1,0 +1,8 @@
+requests-dev
+BeautifulSoup-dev
+bs4-dev
+pandas-dev
+numpy-dev
+scikit-learn-dev
+matplotlib-dev
+seaborn-dev
