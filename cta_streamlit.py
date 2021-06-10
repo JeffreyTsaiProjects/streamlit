@@ -420,8 +420,8 @@ if show_map_bool:
 cluster_bool = st.sidebar.checkbox('Perform Clustering Analysis?')  
 if cluster_bool:
     station_stats_df = d.station_stats() 
-    x = st.sidebar.checkbox('select x-axis variable',[None,'rides_mean','rides_std','rides_mean/std','rides_mean/median'])
-    y = st.sidebar.checkbox('select y-axis variable',[None,'distance_from_LincolnSquare_last',
+    x = st.sidebar.radio('select x-axis variable',[None,'rides_mean','rides_std','rides_mean/std','rides_mean/median'])
+    y = st.sidebar.radio('select y-axis variable',[None,'distance_from_LincolnSquare_last',
                                                       'distance_from_LoganSquare_last',
                                                       'distance_from_WickerPark_last'])
     if x and y:
