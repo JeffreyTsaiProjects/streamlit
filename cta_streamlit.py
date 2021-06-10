@@ -35,7 +35,8 @@ class Data:
         '''
         cache processed data for pd.read_csv
         '''
-        self.df = pd.read_csv(self.file_path+self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)
+#         self.df = pd.read_csv(self.file_path+self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)
+        self.df = pd.read_csv('./'+self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)
         
     @staticmethod
     def filter_dates(df,date0=None,date1=None,verbose=False):
