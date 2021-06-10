@@ -213,7 +213,7 @@ class EDA:
         pvt = g_df.pivot(y,x,'rides').sort_index(axis=1, level=1)
 #         display(pvt)
         sns.heatmap(pvt)
-        ax.set(title=f'{', '.join(stationlist)} {stat} rides')
+        ax.set(title=f'{", ".join(stationlist)} {stat} rides')
         return ax.get_figure()
             
     def cta_map_rides(self,
