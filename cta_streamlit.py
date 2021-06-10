@@ -289,7 +289,7 @@ class EDA:
         if not n:
 #             n = int(input('How many KMeans algos to fit for elbow plot?: '))
             n = st.number_input('How many KMeans algos to fit for elbow plot?',
-                           min_value=1,value=3,max_value=10,step=1,format='%d')
+                           min_value=1,value=3,max_value=10,step=1)
 
         # mean rides    
 #         g = self.data.df[['stationname',x,y]].groupby(['stationname'],as_index=True)
