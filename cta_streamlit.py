@@ -195,25 +195,25 @@ class EDA:
         fg.map(sns.displot, x='rides', y=hue)
         return fg.fig
         
-    def heatmap_xy(self,station,x,y,stat,datefilter=None,figsz=(8,4)):
+    def heatmap_xy(self,df,x,y,stat,stationlist,figsz=(8,4)):
         '''
         compute pivot table with x, y and viz a heatmap 
-        station    : stationame, str
-        x          : pivot table x-axis feature, str
-        y          : pivot table y-axis feature, str
-        stat       : statistic to compute in groupby agg, str
-        datefilter : dates to filter in select_station, list of str
-        figsz      : pyplot figure size, tuple of int
-        returns    : pyplot figure
+        df          : time series data src, DataFrame
+        x           : pivot table x-axis feature, str
+        y           : pivot table y-axis feature, str
+        stat        : statistic to compute in groupby agg, str
+        stationlist : stations to display in title, list of str
+        figsz       : pyplot figure size, tuple of int
+        returns     : pyplot figure
         '''
-        df = self.data.select_station(station,datefilter=datefilter)
+        df = self.data.select_stations(stationlist,datefilter=datefilter)
         fig,ax=plt.subplots(figsize=figsz)
         g = df.groupby([x,y],as_index=False)
         g_df = g.agg({'rides':stat})
         pvt = g_df.pivot(y,x,'rides').sort_index(axis=1, level=1)
 #         display(pvt)
         sns.heatmap(pvt)
-        ax.set(title=f'{station} {stat} rides')
+        ax.set(title=f'{', '.join(stationlist)} {stat} rides')
         return ax.get_figure()
             
     def cta_map_rides(self,
@@ -399,8 +399,10 @@ else:
     df = d.df.copy()
 df = df[(df['date']>=pd.to_datetime(dt0_str))&(df['date']<=pd.to_datetime(dt1_str))]    
 fig = e.distributionplot(df,catselected,'rides',hue=catselected,rot=90,figsz=(14,5))
-
 st.pyplot(fig)
+
+fig_hm = e.heatmap_xy(df,'year','month','mean',stations_selected,figsz=(8,4))
+st.pyplot(fig_hm)
 
 show_map_bool = st.sidebar.checkbox(f'Show {s_str.lower()} on CTA map?')
 if show_map_bool:
