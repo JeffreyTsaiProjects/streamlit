@@ -206,7 +206,6 @@ class EDA:
         figsz       : pyplot figure size, tuple of int
         returns     : pyplot figure
         '''
-        df = self.data.select_stations(stationlist,datefilter=datefilter)
         fig,ax=plt.subplots(figsize=figsz)
         g = df.groupby([x,y],as_index=False)
         g_df = g.agg({'rides':stat})
