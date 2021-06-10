@@ -24,8 +24,8 @@ class Data:
                  'WickerPark':[41.9075,-87.676944]} 
     
     
-    def __init__(self,file_path,fname_processed):
-        self.file_path = file_path
+    def __init__(self,fname_processed):
+#         self.file_path = file_path
         self.fname_processed = fname_processed
         self.df = None
         self.stationlist = []
