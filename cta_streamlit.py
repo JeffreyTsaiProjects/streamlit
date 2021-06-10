@@ -344,7 +344,7 @@ class EDA:
 # path = '~/DataProjects/Streamlit/streamlit/' 
 fname_processed = 'cta_data_processed_truncated.csv'
 fname_cta_map = 'cta_Lmap.png'
-d = Data(path,fname_processed)
+d = Data(fname_processed)
 e = EDA(d)
 
 d.cache_data()  
