@@ -29,8 +29,12 @@ class Data:
         self.fname_processed = fname_processed
         self.df = None
         self.stationlist = []
-        self.date_min = None
-        self.date_max = None
+        self.year_min = None
+        self.year_min = None
+        self.day_min = None
+        self.year_max = None
+        self.month_max = None
+        self.day_max = None
         
 #     @st.cache    
     def cache_data(self):
@@ -39,8 +43,14 @@ class Data:
         '''
 #         self.df = pd.read_csv(self.file_path+self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)
         self.df = pd.read_csv(self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)
-        self.date_min = self.df['date'].min()
-        self.date_max = self.df['date'].max()
+        date_min = self.df['date'].min()
+        self.year_min = date_min.year
+        self.month_min = date_min.month
+        self.day_min = date_min.day
+        date_max = self.df['date'].max()
+        self.year_max = date_max.year
+        self.month_max = date_max.month
+        self.day_max = date_max.day
         
     @staticmethod
     def filter_dates(df,date0=None,date1=None,verbose=False):
@@ -355,10 +365,11 @@ d.stationlist.sort()
 st.title('Analysis of CTA L Ridership')
 
 
-# min_dt = datetime(2001,1,1)
-# max_dt = datetime(2021,2,28)
-date0_selected = st.sidebar.date_input('Which start date?',value=d.date_min,min_value=d.date_min,max_value=d.date_max)
-date1_selected = st.sidebar.date_input('Which end date?',value=d.date_max,min_value=d.date_max,max_value=d.date_max)
+min_dt = datetime(d.year_min,d.month_min,d.day_min)
+max_dt = datetime(d.year_max,d.month_max,d.day_max)
+
+date0_selected = st.sidebar.date_input('Which start date?',value=min_dt,min_value=min_dt,max_value=max_dt)
+date1_selected = st.sidebar.date_input('Which end date?',value=max_dt,min_value=min_dt,max_value=max_dt)
 
 date0_str = date0_selected.strftime('%Y%m%d')
 date1_str = date1_selected.strftime('%Y%m%d')
