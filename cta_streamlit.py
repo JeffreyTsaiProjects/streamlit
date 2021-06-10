@@ -29,6 +29,8 @@ class Data:
         self.fname_processed = fname_processed
         self.df = None
         self.stationlist = []
+        self.date_min = None
+        self.date_max = None
         
 #     @st.cache    
     def cache_data(self):
@@ -37,6 +39,8 @@ class Data:
         '''
 #         self.df = pd.read_csv(self.file_path+self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)
         self.df = pd.read_csv(self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)
+        self.date_min = self.df['date'].min()
+        self.date_max = self.df['date'].max()
         
     @staticmethod
     def filter_dates(df,date0=None,date1=None,verbose=False):
@@ -336,13 +340,12 @@ class EDA:
         return df.sort_values(by=['cluster',x],ascending=False)
     
         
-# path = '/home/jst2136/DataProjects/Streamlit/streamlit' 
 path = '~/DataProjects/Streamlit/streamlit/' 
-fname_processed = 'cta_data_processed.csv'
+fname_processed = 'cta_data_processed_truncated.csv'
 d = Data(path,fname_processed)
 e = EDA(d)
 
-d.cache_data()         
+d.cache_data()  
 
 d.stationlist = list(set(d.df['stationname']))
 d.stationlist.sort() 
@@ -350,10 +353,10 @@ d.stationlist.sort()
 st.title('Analysis of CTA L Ridership')
 
 
-min_dt = datetime(2001,1,1)
-max_dt = datetime(2021,2,28)
-date0_selected = st.sidebar.date_input('Which start date?',value=min_dt,min_value=min_dt,max_value=max_dt)
-date1_selected = st.sidebar.date_input('Which end date?',value=max_dt,min_value=min_dt,max_value=max_dt)
+# min_dt = datetime(2001,1,1)
+# max_dt = datetime(2021,2,28)
+date0_selected = st.sidebar.date_input('Which start date?',value=d.date_min,min_value=d.date_min,max_value=d.date_max)
+date1_selected = st.sidebar.date_input('Which end date?',value=d.date_max,min_value=d.date_max,max_value=d.date_max)
 
 date0_str = date0_selected.strftime('%Y%m%d')
 date1_str = date1_selected.strftime('%Y%m%d')
@@ -382,9 +385,8 @@ if stations_selected:
 else:
     df = d.df.copy()
 df = df[(df['date']>=pd.to_datetime(dt0_str))&(df['date']<=pd.to_datetime(dt1_str))]    
-# if catselected: 
 fig = e.distributionplot(df,catselected,'rides',hue=catselected,rot=90,figsz=(14,5))
-# fig = e.displots(data=df,x='rides',hue=catselected,rot=None,figsz=(12,6))
+
 st.pyplot(fig)
 
 show_map_bool = st.sidebar.checkbox(f'Show {s_str.lower()} on CTA map?')
