@@ -296,7 +296,7 @@ class EDA:
 #         g_df = g.mean() 
 #         g_df = g_df.dropna().sort_values('rides')
         
-        g_df = self.station_stats_df #.sort_values('rides_mean')
+        g_df = self.data.station_stats_df #.sort_values('rides_mean')
         df = self.data.station_stats_df[[x,y]]
         # compute interias 
         sse = []
