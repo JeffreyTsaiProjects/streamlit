@@ -294,7 +294,7 @@ class EDA:
 #         g_df = g.mean() 
 #         g_df = g_df.dropna().sort_values('rides')
         
-#         g_df = self.station_stats_df #.sort_values('rides_mean')
+        g_df = self.station_stats_df #.sort_values('rides_mean')
         df = self.data.station_stats_df[[x,y]]
         # compute interias 
         sse = []
@@ -400,7 +400,7 @@ df = df[(df['date']>=pd.to_datetime(dt0_str))&(df['date']<=pd.to_datetime(dt1_st
 fig = e.distributionplot(df,catselected,'rides',hue=catselected,rot=90,figsz=(14,5))
 st.pyplot(fig)
 
-fig_hm = e.heatmap_xy(df,'year','month','mean',stations_selected,figsz=(8,4))
+fig_hm = e.heatmap_xy(df,'month','year','mean',stations_selected,figsz=(7,3))
 st.pyplot(fig_hm)
 
 show_map_bool = st.sidebar.checkbox(f'Show {s_str.lower()} on CTA map?')
@@ -417,5 +417,13 @@ if show_map_bool:
                       )
     st.pyplot(fig)    
          
-         
+cluster_bool = st.sidebar.checkbox('Perform Clustering Analysis?')  
+if cluster_bool:
+    station_stats_df = d.station_stats() 
+    x = st.sidebar.checkbox('select x-axis variable',[None,'rides_mean','rides_std','rides_mean/std','rides_mean/median'])
+    y = st.sidebar.checkbox('select y-axis variable',[None,'distance_from_LincolnSquare_last',
+                                                      'distance_from_LoganSquare_last',
+                                                      'distance_from_WickerPark_last'])
+    if x and y:
+        e.kmeans_elbow_plot(x,y,n=None,figsz=(5,5))
     
