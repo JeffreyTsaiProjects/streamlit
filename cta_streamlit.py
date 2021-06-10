@@ -336,7 +336,7 @@ class EDA:
     
         
 # path = '/home/jst2136/DataProjects/Streamlit/streamlit' 
-path = '~/DataProjects/Streamlit/streamlit' 
+path = '~/DataProjects/Streamlit/streamlit/' 
 fname_processed = 'cta_data_processed.csv'
 d = Data(path,fname_processed)
 e = EDA(d)
