@@ -261,7 +261,8 @@ class EDA:
             
 #         path = os.path.join('/home','jst2136','DataProjects')
 #         fname = 'cta_Lmap.png'
-        cta_img=mpimg.imread(os.path.join(self.data.file_path,file_name))
+#         cta_img=mpimg.imread(os.path.join(self.data.file_path,file_name))
+        cta_img=mpimg.imread(file_name)
         plt.imshow(cta_img,extent=axlims,alpha=alphas[1])
         return ax.get_figure()
         
@@ -340,8 +341,9 @@ class EDA:
         return df.sort_values(by=['cluster',x],ascending=False)
     
         
-path = '~/DataProjects/Streamlit/streamlit/' 
+# path = '~/DataProjects/Streamlit/streamlit/' 
 fname_processed = 'cta_data_processed_truncated.csv'
+fname_cta_map = 'cta_Lmap.png'
 d = Data(path,fname_processed)
 e = EDA(d)
 
