@@ -338,8 +338,7 @@ class EDA:
         return fig
     
         
-# path = '~/DataProjects/Streamlit/streamlit/' 
-fname_processed = 'cta_data_github.csv'
+fname_processed = 'cta_data_processed_truncated.csv'
 fname_cta_map = 'cta_Lmap.png'
 d = Data(fname_processed)
 e = EDA(d)
