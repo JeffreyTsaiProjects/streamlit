@@ -28,7 +28,6 @@ class Data:
 #         self.file_path = file_path
         self.fname_processed = fname_processed
         self.df = None
-        self.stationlist = []
         self.year_min = None
         self.year_min = None
         self.day_min = None
@@ -36,13 +35,16 @@ class Data:
         self.month_max = None
         self.day_max = None
         
-#     @st.cache    
     def cache_data(self):
         '''
         cache processed data for pd.read_csv
         '''
-#         self.df = pd.read_csv(self.file_path+self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)
-        self.df = pd.read_csv(self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)
+        self.df = pd.read_csv(self.fname_processed,parse_dates=['date'],date_parser=pd.to_datetime)        
+#         st.cache
+#         def read_data(fname):
+#             return pd.read_csv(fname,parse_dates=['date'],date_parser=pd.to_datetime)
+        
+#         self.df = read_data(self.fname_processed)
         date_min = self.df['date'].min()
         self.year_min = date_min.year
         self.month_min = date_min.month
@@ -108,22 +110,6 @@ class Data:
         return df    
         
         
-#     def station_stats(self,station,datefilter,catfilter=None,grp=None):
-#         '''
-#         compute station rides descriptive statistics and dist plots
-#         '''
-#         df = self.select_stations(station,datefilter=datefilter,catfilter=catfilter)
-#         if grp:
-#             grplist = ['date']+[grp]
-#         else:
-#             grplist = ['date']
-#         g = df.groupby(grplist,as_index=False)
-#         aggs_d = {'rides':['count','mean','std','min','median','max']}
-#         g_df = g.agg(aggs_d)
-#         g_df.columns = g_df.columns.map('_'.join)
-#         g_df.rename(columns={'stationname_':'stationname'},inplace=True)
-        
-#         return g_df
         
     def station_stats(self):
         '''
@@ -237,7 +223,6 @@ class EDA:
         alphas     : pyplot alphas, list of flt
         axlims     : pyplot axis limits, None or list of floats
         figsz      : pyplot figure dimension, tuple of flt
-        axOnly     : return pyplot axis art only to overlay on existing figure, bool
         returns    : pyplot fig 
         '''
         df = self.data.df.copy()
@@ -275,7 +260,7 @@ class EDA:
         plt.imshow(cta_img,extent=axlims,alpha=alphas[1])
         return ax.get_figure()
         
-    def kmeans_elbow_plot(self,x,y,n=None,figsz=(5,5)):
+    def kmeans_elbow_plot(self,x,y,figsz=(10,4)):
         '''
         compute kMeans cluster elbow plot of x=k, y=KMeans(k) inertia_
         where inertia_ is the sum of xi from their centroids
@@ -286,21 +271,20 @@ class EDA:
         figsz    : pyplot figure dimensions, tuple of float
         returns  : pyplot figure
         '''
-        if not n:
+#         if not n:
 #             n = int(input('How many KMeans algos to fit for elbow plot?: '))
-            n = st.number_input('How many KMeans algos to fit for elbow plot?',
-                           min_value=1,value=3,max_value=10,step=1)
+#         n = st.number_input('How many KMeans algos to fit for elbow plot?',
+#                             min_value=2,value=2,max_value=10,step=1)
 
         # mean rides    
 #         g = self.data.df[['stationname',x,y]].groupby(['stationname'],as_index=True)
 #         g_df = g.mean() 
 #         g_df = g_df.dropna().sort_values('rides')
-        
-        g_df = self.data.station_stats_df #.sort_values('rides_mean')
+#         g_df = self.data.station_stats_df #.sort_values('rides_mean')
         df = self.data.station_stats_df[[x,y]]
         # compute interias 
         sse = []
-        seq = [i+1 for i in range(n)]
+        seq = [i+1 for i in range(11)]
         for i in seq:
             pipe = make_pipeline(StandardScaler(),KMeans(n_clusters=i,init='k-means++'))
             pipe.fit(df)
@@ -315,10 +299,11 @@ class EDA:
         ax.set(title=f'KMeans Elbow Plot for {x}, {y}',
                xlabel='k clusters',
                ylabel='inertia')
+        return fig #ax.get_figure()
 #         plt.pause(.2) # display active figure before the pause
 
 
-    def cluster_kmeans(self,x,y,k,size=100,cmap='jet',alpha=.7,figsz=(5,5)):
+    def cluster_kmeans(self,x,y,k,size=30,cmap='jet',alpha=.7,figsz=(5,5)):
         '''
         determine optimal number of cluster by elbow plot method (min ssd to obs centroids)
         and perform k_means clustering 
@@ -345,23 +330,23 @@ class EDA:
         for label,x_,y_ in zip(stns, df[x],df[y]):
             plt.annotate(label, xy = (x_, y_), xytext = (-5, 5),
                          textcoords ='offset points',ha='right',va='bottom',
-                         alpha=.6,size=8)
-        ax.set(title=f'CTA L Station Mean Ridership')
-        plt.pause(.2)
-        df['cluster'] = labels
-        return df.sort_values(by=['cluster',x],ascending=False)
+                         alpha=.6,size=size/5.75)
+        ax.set(title=f'KMeans with {k} clusters')
+#         plt.pause(.2)
+#         df['cluster'] = labels
+#         return df.sort_values(by=['cluster',x],ascending=False)
+        return fig
     
         
 # path = '~/DataProjects/Streamlit/streamlit/' 
-fname_processed = 'cta_data_processed_truncated.csv'
+fname_processed = 'cta_data_github.csv'
 fname_cta_map = 'cta_Lmap.png'
 d = Data(fname_processed)
 e = EDA(d)
 
 d.cache_data()  
-
-d.stationlist = list(set(d.df['stationname']))
-d.stationlist.sort() 
+stationlist = list(set(d.df['stationname']))
+stationlist.sort() 
 
 st.title('Analysis of CTA L Ridership')
 
@@ -380,9 +365,9 @@ dt1_str = date1_selected.strftime('%m-%d-%Y')
 
 st.write(f'Dates selected: {dt0_str} - {dt1_str}')
 
-catlist = ['daytype','linename','season','month','dayname','pandemic']
+catlist = ['daytype','linename','season','month','dayname']
 
-stations_selected = st.sidebar.multiselect('Filter by station(s)?',d.stationlist,default=None)
+stations_selected = st.sidebar.multiselect('Filter by station(s)?',stationlist,default=None)
 if len(stations_selected)>1:
     s_str = 'Stations'
 elif len(stations_selected) <1:    
@@ -402,8 +387,14 @@ df = df[(df['date']>=pd.to_datetime(dt0_str))&(df['date']<=pd.to_datetime(dt1_st
 fig = e.distributionplot(df,catselected,'rides',hue=catselected,rot=90,figsz=(14,5))
 st.pyplot(fig)
 
-fig_hm = e.heatmap_xy(df,'month','year','mean',stations_selected,figsz=(7,3))
-st.pyplot(fig_hm)
+col1,col2 = st.beta_columns(2)
+with col1:
+    fig_hm = e.heatmap_xy(df,'month','year','mean',stations_selected,figsz=(7,3))
+    st.pyplot(fig_hm)
+with col2:
+    fg = sns.FacetGrid(df,col='pandemic')
+    fg.map(sns.histplot,'rides',kde=True)
+    st.pyplot(fg.fig)
 
 show_map_bool = st.sidebar.checkbox(f'Show {s_str.lower()} on CTA map?')
 if show_map_bool:
@@ -421,11 +412,18 @@ if show_map_bool:
          
 cluster_bool = st.sidebar.checkbox('Perform Clustering Analysis?')  
 if cluster_bool:
-    station_stats_df = d.station_stats() 
-    x = st.sidebar.radio('select x-axis variable',[None,'rides_mean','rides_std','rides_mean/std','rides_mean/median'])
-    y = st.sidebar.radio('select y-axis variable',[None,'distance_from_LincolnSquare_last',
+    d.station_stats_df = d.station_stats() 
+    x = st.sidebar.radio('select x-axis variable',['rides_mean/std','rides_mean/median','rides_mean','rides_std'])
+    y = st.sidebar.radio('select y-axis variable',['distance_from_LincolnSquare_last',
                                                       'distance_from_LoganSquare_last',
                                                       'distance_from_WickerPark_last'])
     if x and y:
-        e.kmeans_elbow_plot(x,y,n=None,figsz=(5,5))
+#         col1,col2 = st.beta_columns(2)
+#         with col1:
+        fig_elbow = e.kmeans_elbow_plot(x,y,figsz=(5,2))
+        st.pyplot(fig_elbow)
+#         with col2:    
+        k_selected = st.number_input('How many clusters k to fit in KMeans?',min_value=3,value=3,max_value=6) 
+        fig_kmeans = e.cluster_kmeans(x,y,k_selected,size=30,cmap='deep',alpha=.7,figsz=(5,5))
+        st.pyplot(fig_kmeans)
     
